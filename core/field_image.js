@@ -38,10 +38,11 @@ goog.require('goog.userAgent');
  * @param {number} width Width of the image.
  * @param {number} height Height of the image.
  * @param {string=} opt_alt Optional alt text for when block is collapsed.
+ * @param {function=} opt_onclick Optional function to be called when image is clicked
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldImage = function(src, width, height, opt_alt) {
+Blockly.FieldImage = function(src, width, height, opt_alt, opt_onclick) {
   this.sourceBlock_ = null;
 
   // Ensure height and width are numbers.  Strings are bad at math.
@@ -51,6 +52,10 @@ Blockly.FieldImage = function(src, width, height, opt_alt) {
       this.height_ + 2 * Blockly.BlockSvg.INLINE_PADDING_Y);
   this.text_ = opt_alt || '';
   this.setValue(src);
+
+  if(typeof opt_onclick === "function"){
+     this.clickHandler_ = opt_onclick;
+  }
 };
 goog.inherits(Blockly.FieldImage, Blockly.Field);
 
@@ -81,6 +86,12 @@ Blockly.FieldImage.prototype.init = function() {
       'width': this.width_ + 'px'
     },
     this.fieldGroup_);
+
+    this.imageElement_.onclick = this.clickHandler_;
+    if (this.clickHandler_ !== null) {
+      this.imageElement_.style.cursor = 'pointer';
+    }
+
   this.setValue(this.src_);
   this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
 
